@@ -1630,7 +1630,7 @@
         title.innerText = '🥖 نوع الخبز:';
         grid.innerHTML = `
           <label class="option-item"><input type="radio" name="opt_bread" value="خبز أبيض" checked onchange="updateCustomModalQtyDisplay()"> خبز أبيض</label>
-          <label class="option-item"><input type="radio" name="opt_bread" value="خبز صاج" onchange="updateCustomModalQtyDisplay()"> خبز صاج</label>
+          <label class="option-item"><input type="radio" name="opt_bread" value="خبز صاج (+1 ر.ي)" onchange="updateCustomModalQtyDisplay()"> <span style="color: var(--accent); font-weight: 800;">خبز صاج (+1 ر.ي)</span></label>
         `;
         return;
       }
@@ -1680,24 +1680,24 @@
         return;
       }
 
-      // 6. تورتيلا كبير: أبيض وصاج
+      // 6. تورتيلا كبير: أبيض وصاج (+1 ر.ي)
       if (itemName.includes('تورتيلا') && itemName.includes('كبير')) {
         container.style.display = 'block';
         title.innerText = '🥖 نوع الخبز:';
         grid.innerHTML = `
           <label class="option-item"><input type="radio" name="opt_bread" value="خبز أبيض" checked onchange="updateCustomModalQtyDisplay()"> خبز أبيض</label>
-          <label class="option-item"><input type="radio" name="opt_bread" value="خبز صاج" onchange="updateCustomModalQtyDisplay()"> خبز صاج</label>
+          <label class="option-item"><input type="radio" name="opt_bread" value="خبز صاج (+1 ر.ي)" onchange="updateCustomModalQtyDisplay()"> <span style="color: var(--accent); font-weight: 800;">خبز صاج (+1 ر.ي)</span></label>
         `;
         return;
       }
 
-      // 7. تورتيلا صغير: أبيض وصاج وأسمر
+      // 7. تورتيلا صغير: أبيض وصاج (+1 ر.ي) وأسمر
       if (itemName.includes('تورتيلا') && itemName.includes('صغير')) {
         container.style.display = 'block';
         title.innerText = '🥖 نوع الخبز:';
         grid.innerHTML = `
           <label class="option-item"><input type="radio" name="opt_bread" value="خبز أبيض" checked onchange="updateCustomModalQtyDisplay()"> خبز أبيض</label>
-          <label class="option-item"><input type="radio" name="opt_bread" value="خبز صاج" onchange="updateCustomModalQtyDisplay()"> خبز صاج</label>
+          <label class="option-item"><input type="radio" name="opt_bread" value="خبز صاج (+1 ر.ي)" onchange="updateCustomModalQtyDisplay()"> <span style="color: var(--accent); font-weight: 800;">خبز صاج (+1 ر.ي)</span></label>
           <label class="option-item"><input type="radio" name="opt_bread" value="خبز أسمر" onchange="updateCustomModalQtyDisplay()"> خبز أسمر</label>
         `;
         return;
@@ -1795,6 +1795,7 @@
       grid.innerHTML = `
         <label class="option-item"><input type="radio" name="opt_cheese" value="بدون جبن" ${defaultChoice === 'بدون جبن' ? 'checked' : ''} onchange="updateCustomModalQtyDisplay()"> بدون جبن</label>
         <label class="option-item"><input type="radio" name="opt_cheese" value="مع جبن (+1 ر.ي)" ${defaultChoice === 'مع جبن (+1 ر.ي)' ? 'checked' : ''} onchange="updateCustomModalQtyDisplay()"> <span style="color: var(--accent); font-weight: 800;">مع جبن (+1 ر.ي)</span></label>
+        <label class="option-item"><input type="radio" name="opt_cheese" value="دبل جبن (+2 ر.ي)" onchange="updateCustomModalQtyDisplay()"> <span style="color: var(--accent); font-weight: 800;">دبل جبن (+2 ر.ي)</span></label>
       `;
     }
 
@@ -1883,8 +1884,12 @@
         notice.style.display = 'none';
       }
 
-      if (cheeseOpt && cheeseOpt.value.includes('مع جبن')) {
-        cheeseExtra = 1;
+      if (cheeseOpt) {
+        if (cheeseOpt.value.includes('دبل جبن')) {
+          cheeseExtra = 2;
+        } else if (cheeseOpt.value.includes('مع جبن')) {
+          cheeseExtra = 1;
+        }
       }
 
       if (prepOpt && prepOpt.value.includes('مقلي')) {
@@ -1965,7 +1970,8 @@
       const cheeseOpt = document.querySelector('input[name="opt_cheese"]:checked');
       if (cheeseOpt) {
         options.push(cheeseOpt.value);
-        if (cheeseOpt.value.includes('مع جبن')) cheeseExtra = 1;
+        if (cheeseOpt.value.includes('دبل جبن')) cheeseExtra = 2;
+        else if (cheeseOpt.value.includes('مع جبن')) cheeseExtra = 1;
       }
 
       document.querySelectorAll('.note-chip input:checked').forEach(chk => {
