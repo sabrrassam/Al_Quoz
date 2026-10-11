@@ -1775,14 +1775,33 @@
         return;
       }
 
-      const hasCheeseVariant = /صحن|شاورما|ساندوتش|برجر|جانبو|جامبو|توست|تورتيلا|مسحب|بطاطس|كلوب/.test(itemName);
+      const hasCheeseVariant = /صحن|باشكا|شاورما|ساندوتش|برجر|جانبو|جامبو|توست|تورتيلا|مسحب|بطاطس|كلوب/.test(itemName);
       if (!hasCheeseVariant) {
         container.style.display = 'none';
         grid.innerHTML = '';
         return;
       }
 
+      if (itemName.includes('باشكا')) {
+        container.style.display = 'block';
+        grid.innerHTML = `
+          <label class="option-item"><input type="radio" name="opt_cheese" value="بدون جبن" ${defaultChoice === 'بدون جبن' ? 'checked' : ''} onchange="updateCustomModalQtyDisplay()"> بدون جبن</label>
+          <label class="option-item"><input type="radio" name="opt_cheese" value="مع جبن (+2 ر.ي)" ${defaultChoice === 'مع جبن (+2 ر.ي)' ? 'checked' : ''} onchange="updateCustomModalQtyDisplay()"> <span style="color: var(--accent); font-weight: 800;">مع جبن (+2 ر.ي)</span></label>
+          <label class="option-item"><input type="radio" name="opt_cheese" value="دبل جبن (+4 ر.ي)" onchange="updateCustomModalQtyDisplay()"> <span style="color: var(--accent); font-weight: 800;">دبل جبن (+4 ر.ي)</span></label>
+        `;
+        return;
+      }
+
       container.style.display = 'block';
+
+      if (itemName.includes('كلوب')) {
+        grid.innerHTML = `
+          <label class="option-item"><input type="radio" name="opt_cheese" value="بدون جبن" ${defaultChoice === 'بدون جبن' ? 'checked' : ''} onchange="updateCustomModalQtyDisplay()"> بدون جبن</label>
+          <label class="option-item"><input type="radio" name="opt_cheese" value="مع جبن (+2 ر.ي)" ${defaultChoice === 'مع جبن (+2 ر.ي)' ? 'checked' : ''} onchange="updateCustomModalQtyDisplay()"> <span style="color: var(--accent); font-weight: 800;">مع جبن (+2 ر.ي)</span></label>
+          <label class="option-item"><input type="radio" name="opt_cheese" value="دبل جبن (+4 ر.ي)" onchange="updateCustomModalQtyDisplay()"> <span style="color: var(--accent); font-weight: 800;">دبل جبن (+4 ر.ي)</span></label>
+        `;
+        return;
+      }
 
       if (itemName.includes('صحن بطاطس')) {
         grid.innerHTML = `
@@ -1894,9 +1913,14 @@
       }
 
       if (cheeseOpt) {
-        if (currentCustomizingItem.name.includes('صحن بطاطس')) {
+        if (currentCustomizingItem.name.includes('باشكا')) {
+          cheeseExtra = 0;
+        } else if (currentCustomizingItem.name.includes('صحن بطاطس')) {
           cheeseExtra = cheeseOpt.value.includes('مع جبن') ? 3 : 0;
         } else if (currentCustomizingItem.name.includes('صحن')) {
+          if (cheeseOpt.value.includes('دبل جبن')) cheeseExtra = 4;
+          else if (cheeseOpt.value.includes('مع جبن')) cheeseExtra = 2;
+        } else if (currentCustomizingItem.name.includes('كلوب')) {
           if (cheeseOpt.value.includes('دبل جبن')) cheeseExtra = 4;
           else if (cheeseOpt.value.includes('مع جبن')) cheeseExtra = 2;
         } else if (cheeseOpt.value.includes('دبل جبن')) {
@@ -1984,9 +2008,14 @@
       const cheeseOpt = document.querySelector('input[name="opt_cheese"]:checked');
       if (cheeseOpt) {
         options.push(cheeseOpt.value);
-        if (currentCustomizingItem.name.includes('صحن بطاطس')) {
+        if (currentCustomizingItem.name.includes('باشكا')) {
+          cheeseExtra = 0;
+        } else if (currentCustomizingItem.name.includes('صحن بطاطس')) {
           cheeseExtra = cheeseOpt.value.includes('مع جبن') ? 3 : 0;
         } else if (currentCustomizingItem.name.includes('صحن')) {
+          if (cheeseOpt.value.includes('دبل جبن')) cheeseExtra = 4;
+          else if (cheeseOpt.value.includes('مع جبن')) cheeseExtra = 2;
+        } else if (currentCustomizingItem.name.includes('كلوب')) {
           if (cheeseOpt.value.includes('دبل جبن')) cheeseExtra = 4;
           else if (cheeseOpt.value.includes('مع جبن')) cheeseExtra = 2;
         } else if (cheeseOpt.value.includes('دبل جبن')) {
