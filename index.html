@@ -1940,10 +1940,11 @@
       const subtotal = unitPrice * currentCustomizingQty;
       document.getElementById('customModalSubtotal').innerText = `${subtotal.toFixed(2)} ر.ي`;
 
-      const nonDrinkTargetCount = cart.filter(it => it.baseName === currentCustomizingItem.name && !it.isFree && !isDrinkItemName(it.baseName))
+      const isOfferEligible = !isDrinkItemName(currentCustomizingItem.name) && !currentCustomizingItem.name.startsWith('إضافة:');
+      const nonDrinkTargetCount = cart.filter(it => it.baseName === currentCustomizingItem.name && !it.isFree && !isDrinkItemName(it.baseName) && !it.baseName.startsWith('إضافة:'))
                                      .reduce((sum, it) => sum + it.qty, 0);
       const hint = document.getElementById('freeItemHint');
-      if (!isDrinkItemName(currentCustomizingItem.name) && nonDrinkTargetCount + currentCustomizingQty >= 3) {
+      if (isOfferEligible && nonDrinkTargetCount + currentCustomizingQty >= 3) {
         hint.style.display = 'block';
       } else {
         hint.style.display = 'none';
@@ -1959,7 +1960,7 @@
 
       let baseCounts = {};
       cart.forEach(item => {
-        if (isDrinkItemName(item.baseName)) return;
+        if (isDrinkItemName(item.baseName) || (item.baseName && item.baseName.startsWith('إضافة:'))) return;
         baseCounts[item.baseName] = (baseCounts[item.baseName] || 0) + item.qty;
       });
 
@@ -2032,7 +2033,7 @@
       const note = document.getElementById('itemCustomNote').value.trim();
       const finalItemPrice = currentCustomizingItem.basePrice + breadExtra + cheeseExtra;
 
-      const previousTotalForThisItem = cart.filter(it => it.baseName === currentCustomizingItem.name && !it.isFree && !isDrinkItemName(it.baseName))
+      const previousTotalForThisItem = cart.filter(it => it.baseName === currentCustomizingItem.name && !it.isFree && !isDrinkItemName(it.baseName) && !it.baseName.startsWith('إضافة:'))
                                            .reduce((sum, it) => sum + it.qty, 0);
 
       cart.push({ 
@@ -2047,10 +2048,10 @@
 
       evaluateCartFamilyOffers();
 
-      const newTotalForThisItem = cart.filter(it => it.baseName === currentCustomizingItem.name && !it.isFree && !isDrinkItemName(it.baseName))
+      const newTotalForThisItem = cart.filter(it => it.baseName === currentCustomizingItem.name && !it.isFree && !isDrinkItemName(it.baseName) && !it.baseName.startsWith('إضافة:'))
                                       .reduce((sum, it) => sum + it.qty, 0);
       
-      if (!isDrinkItemName(currentCustomizingItem.name) && Math.floor(newTotalForThisItem / 3) > Math.floor(previousTotalForThisItem / 3)) {
+      if (!isDrinkItemName(currentCustomizingItem.name) && !currentCustomizingItem.name.startsWith('إضافة:') && Math.floor(newTotalForThisItem / 3) > Math.floor(previousTotalForThisItem / 3)) {
         showOfferToast();
       }
 
@@ -2059,7 +2060,7 @@
     }
 
     function addDirectItem(name, price) {
-      const previousTotal = cart.filter(it => it.baseName === name && !it.isFree && !isDrinkItemName(it.baseName))
+      const previousTotal = cart.filter(it => it.baseName === name && !it.isFree && !isDrinkItemName(it.baseName) && !it.baseName.startsWith('إضافة:'))
                                 .reduce((sum, it) => sum + it.qty, 0);
 
       cart.push({ 
@@ -2074,10 +2075,10 @@
 
       evaluateCartFamilyOffers();
 
-      const newTotal = cart.filter(it => it.baseName === name && !it.isFree && !isDrinkItemName(it.baseName))
+      const newTotal = cart.filter(it => it.baseName === name && !it.isFree && !isDrinkItemName(it.baseName) && !it.baseName.startsWith('إضافة:'))
                            .reduce((sum, it) => sum + it.qty, 0);
 
-      if (!isDrinkItemName(name) && Math.floor(newTotal / 3) > Math.floor(previousTotal / 3)) {
+      if (!isDrinkItemName(name) && !name.startsWith('إضافة:') && Math.floor(newTotal / 3) > Math.floor(previousTotal / 3)) {
         showOfferToast();
       }
 
