@@ -361,6 +361,22 @@
       color: #fff;
       box-shadow: 0 0 10px rgba(247, 127, 0, 0.4);
     }
+    .notes-section { margin: 0.8rem 0; }
+    .notes-section-toggle {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      list-style: none;
+    }
+    .notes-section-toggle::-webkit-details-marker { display: none; }
+    .notes-section-toggle::after {
+      content: '▼';
+      font-size: 0.75rem;
+      transition: transform 0.2s ease;
+    }
+    .notes-section[open] > .notes-section-toggle::after { transform: rotate(180deg); }
+    .notes-section-content { padding-top: 0.2rem; }
 
     .qty-counter-box { background: rgba(36, 21, 18, 0.95); border: 1.5px solid var(--secondary); border-radius: 12px; padding: 0.8rem 1rem; display: flex; justify-content: space-between; align-items: center; margin: 1rem 0 0.6rem; }
     .qty-controls { display: flex; align-items: center; gap: 12px; }
@@ -1301,28 +1317,33 @@
           <div class="options-grid" id="cheeseOptionsGrid"></div>
         </div>
 
-        <!-- تفضيلات وملاحظات الطلب All Notes -->
-        <div class="option-group-title">✨ تفضيلات وملاحظات الطلب (All Notes):</div>
-        <div class="notes-chips-grid" id="notesChipsWrapper">
-          <label class="note-chip"><input type="checkbox" value="مخلل">مخلل</label>
-          <label class="note-chip"><input type="checkbox" value="مع الثوم">مع الثوم</label>
-          <label class="note-chip"><input type="checkbox" value="مع الكتشب">مع الكتشب</label>
-          <label class="note-chip"><input type="checkbox" value="مع الشطه العادي">مع الشطه العادي</label>
-          <label class="note-chip"><input type="checkbox" value="خس">خس</label>
-          <label class="note-chip"><input type="checkbox" value="صوصات خفيف">صوصات خفيف</label>
-          <label class="note-chip"><input type="checkbox" value="شطه حار خفيف">شطه حار خفيف</label>
-          <label class="note-chip"><input type="checkbox" value="بدون بطاطس">بدون بطاطس</label>
-          <label class="note-chip"><input type="checkbox" value="بدون كوكتيل">بدون كوكتيل</label>
-          <label class="note-chip"><input type="checkbox" value="بدون دجاج">بدون دجاج</label>
-          <label class="note-chip"><input type="checkbox" value="دجاج فقط">دجاج فقط</label>
-          <label class="note-chip"><input type="checkbox" value="دجاج وبطاطس">دجاج وبطاطس</label>
-          <label class="note-chip"><input type="checkbox" value="كل شي">كل شي</label>
-          <label class="note-chip"><input type="checkbox" value="بدون ثوم">بدون ثوم</label>
-          <label class="note-chip"><input type="checkbox" value="بدون كتشب">بدون كتشب</label>
-          <label class="note-chip"><input type="checkbox" value="بدون شطة">بدون شطة</label>
-          <label class="note-chip"><input type="checkbox" value="سبايسي">سبايسي</label>
-          <label class="note-chip"><input type="checkbox" value="مجمر">مجمر</label>
-        </div>
+        <details class="notes-section">
+          <summary class="option-group-title notes-section-toggle">✨ تفضيلات وملاحظات الطلب (All Notes):</summary>
+          <div class="notes-section-content">
+            <div class="notes-chips-grid" id="notesChipsWrapper">
+              <label class="note-chip"><input type="checkbox" value="مخلل">مخلل</label>
+              <label class="note-chip"><input type="checkbox" value="مع الثوم">مع الثوم</label>
+              <label class="note-chip"><input type="checkbox" value="مع الكتشب">مع الكتشب</label>
+              <label class="note-chip"><input type="checkbox" value="مع الشطه العادي">مع الشطه العادي</label>
+              <label class="note-chip"><input type="checkbox" value="خس">خس</label>
+              <label class="note-chip"><input type="checkbox" value="صوصات خفيف">صوصات خفيف</label>
+              <label class="note-chip"><input type="checkbox" value="شطه حار خفيف">شطه حار خفيف</label>
+              <label class="note-chip"><input type="checkbox" value="بدون بطاطس">بدون بطاطس</label>
+              <label class="note-chip"><input type="checkbox" value="بدون كوكتيل">بدون كوكتيل</label>
+              <label class="note-chip"><input type="checkbox" value="بدون دجاج">بدون دجاج</label>
+              <label class="note-chip"><input type="checkbox" value="دجاج فقط">دجاج فقط</label>
+              <label class="note-chip"><input type="checkbox" value="دجاج وبطاطس">دجاج وبطاطس</label>
+              <label class="note-chip"><input type="checkbox" value="كل شي">كل شي</label>
+              <label class="note-chip"><input type="checkbox" value="بدون ثوم">بدون ثوم</label>
+              <label class="note-chip"><input type="checkbox" value="بدون كتشب">بدون كتشب</label>
+              <label class="note-chip"><input type="checkbox" value="بدون شطة">بدون شطة</label>
+              <label class="note-chip"><input type="checkbox" value="سبايسي">سبايسي</label>
+              <label class="note-chip"><input type="checkbox" value="مجمر">مجمر</label>
+            </div>
+            <div class="option-group-title">✍️ ملاحظات خاصة إضافية إن وجدت:</div>
+            <textarea id="itemCustomNote" class="notes-textarea" rows="2" placeholder="اكتب أي ملاحظة أخرى هنا..."></textarea>
+          </div>
+        </details>
 
         <div class="option-group-title">🔢 تحديد الكمية المطلوبة والحساب:</div>
         <div class="qty-counter-box">
@@ -1339,8 +1360,6 @@
         <div id="freeItemHint" style="display:none; color:#25d366; font-size:0.85rem; font-weight:800; text-align:center; margin-top:4px;">
           🎁 مبروك! سيتم إضافة الوجبة الرابعة مجاناً لحسابك تلقائياً في السلة.
         </div>
-        <div class="option-group-title">✍️ ملاحظات خاصة إضافية إن وجدت:</div>
-        <textarea id="itemCustomNote" class="notes-textarea" rows="2" placeholder="اكتب أي ملاحظة أخرى هنا..."></textarea>
         <button type="button" class="btn-modal-action" onclick="confirmItemCustomization()">تأكيد وإضافة للسلة 🛒</button>
       </form>
     </div>
