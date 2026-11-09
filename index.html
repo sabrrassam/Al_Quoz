@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>القوز شاورمايشن | خيارك الصح .. في الوقت الصح</title>
+  <title>شاورمايشن القوز | خيارك الصح .. في الوقت الصح</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -628,7 +628,7 @@
       <div class="splash-logo-ring">
         <span style="font-size: 2.4rem;">🌯</span>
       </div>
-      <div class="splash-logo-badge">القوز شاورمايشن</div>
+      <div class="splash-logo-badge">شاورمايشن القوز</div>
       <div class="splash-slogan">طعم .. مذاق .. لذاذه ✨</div>
       <div class="splash-family-offer">🎁 عرض الأسرة بانتظارك</div>
       <div class="splash-branch-label">📍 فرع القوز (مجمع فواصل)</div>
@@ -672,7 +672,7 @@
 
     <div class="hero-content">
       <span class="tagline" id="heroTagline">خيارك الصح .. في الوقت الصح ✨</span>
-      <h1>القوز <span>شاورمايشن</span></h1>
+      <h1><span>شاورمايشن</span> القوز</h1>
       <p class="hero-sub" id="heroSubText">قائمة فرع القوز الكاملة لأشهى صحون وسندوتشات الشاورما، البرجر، التورتيلا والوجبات</p>
 
     </div>
@@ -1618,7 +1618,7 @@
         <label style="font-weight: 800; color: var(--accent);">🚚 اختر طريقة استلام الطلب:</label>
         <div class="select-wrapper" style="margin-top: 5px;">
             <select id="deliverySelect" onchange="toggleDeliveryOptions()" class="input-field" style="font-weight: bold; background: rgba(15, 118, 110, 0.9);">
-                <option value="توصيل">توصيل للموقع (رسوم 10 ر.ي)</option>
+                <option value="توصيل">توصيل للموقع (رسوم حسب إجمالي الطلب)</option>
                 <option value="استلام سيارة">استلام من مواقف المطعم (سيارة)</option>
                 <option value="من المحل">استلام شخصي من المحل</option>
                 <option value="إضافة على الطلب السابق">إضافة على الطلب السابق</option>
@@ -2416,10 +2416,17 @@
       }
     }
 
+    function getDeliveryFee(subtotal) {
+      return subtotal > 30 ? 5 : 10;
+    }
+
     function updateCartModalTotal() {
        let subtotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
        const method = document.getElementById('deliverySelect').value;
-       if (method === 'توصيل') subtotal += 10;
+       const deliveryFee = getDeliveryFee(subtotal);
+       document.querySelector('#deliverySelect option[value="توصيل"]').textContent =
+         `توصيل للموقع (رسوم ${deliveryFee} ر.ي)`;
+       if (method === 'توصيل') subtotal += deliveryFee;
        document.getElementById('cartModalTotal').innerText = subtotal.toFixed(2);
        return subtotal;
     }
@@ -2517,10 +2524,11 @@
       if(method === 'إضافة على الطلب السابق') {
           orderText += `📌 *ملاحظة:* هذا الطلب يضاف إلى الطلب السابق، بدون رسوم توصيل إضافية.\n`;
       } else if(method === 'توصيل') {
+          const deliveryFee = getDeliveryFee(itemsSum);
           orderText += `👤 *العميل / العنوان:* ${customerAddress ? customerAddress : 'لم يكتب العنوان'}\n`;
           orderText += `📍 *الموقع:* (سيتم إرسال الموقع عبر خرائط جوجل)\n`;
-          orderText += `🛵 رسوم التوصيل: +10 ر.ي\n`;
-          itemsSum += 10;
+          orderText += `🛵 رسوم التوصيل: +${deliveryFee} ر.ي\n`;
+          itemsSum += deliveryFee;
       } else if(method === 'استلام سيارة') {
           orderText += `🚗 *بيانات السيارة:* ${carDetails ? carDetails : 'لم يحدد'}\n`;
       } else if(method === 'من المحل') {
