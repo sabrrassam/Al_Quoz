@@ -394,6 +394,9 @@
     .info-card { max-width: 750px; margin: auto; background: var(--cream); border: 1px solid rgba(200, 155, 60, 0.5); padding: 2.5rem; border-radius: 20px; box-shadow: 0 10px 30px rgba(15, 118, 110, 0.08); }
     .phone-number { font-size: 2.2rem; font-weight: 900; color: var(--primary); direction: ltr; display: inline-block; margin: 1rem 0; text-decoration: none; }
     .delivery-note { color: var(--primary); background: rgba(200, 155, 60, 0.12); border: 1px solid rgba(200, 155, 60, 0.45); border-radius: 10px; padding: 0.55rem 0.75rem; font-size: 0.78rem; line-height: 1.6; font-weight: 700; }
+    .delivery-validation-notice { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 0.75rem; padding: 0.65rem 0.8rem; border: 1px solid #c62828; border-radius: 10px; background: rgba(198, 40, 40, 0.08); color: #a51f1f; font: inherit; font-size: 0.88rem; font-weight: 800; text-align: right; cursor: pointer; }
+    .delivery-validation-notice[hidden] { display: none; }
+    .delivery-validation-close { flex: 0 0 auto; margin-right: 0.75rem; font-size: 1.2rem; line-height: 1; }
     
     .cart-float { position: fixed; bottom: calc(14px + env(safe-area-inset-bottom)); left: max(14px, env(safe-area-inset-left)); background: var(--primary); color: var(--cream); border: 1px solid var(--secondary); padding: 0.72rem 1.15rem; border-radius: 50px; box-shadow: 0 8px 24px rgba(15, 118, 110, 0.2); font-weight: 800; cursor: pointer; z-index: 1100; display: flex; align-items: center; gap: 8px; transition: transform 0.2s ease; }
     .cart-float:hover { transform: scale(1.05); }
@@ -1625,7 +1628,7 @@
         <label style="font-weight: 800; color: var(--accent);">🚚 اختر طريقة استلام الطلب:</label>
         <div class="select-wrapper" style="margin-top: 5px;">
             <select id="deliverySelect" onchange="toggleDeliveryOptions()" class="input-field" style="font-weight: bold; background: rgba(15, 118, 110, 0.9);">
-                <option value="توصيل">توصيل للموقع (رسوم حسب إجمالي الطلب)</option>
+                <option value="توصيل">توصيل للموقع (رسوم 10 ر.ي)</option>
                 <option value="استلام سيارة">استلام من مواقف المطعم (سيارة)</option>
                 <option value="من المحل">استلام شخصي من المحل</option>
                 <option value="إضافة على الطلب السابق">إضافة على الطلب السابق</option>
@@ -1658,10 +1661,17 @@
         </div>
       </div>
 
-      <div style="margin-top: 1.5rem; border-top: 1px dashed rgba(200, 155, 60, 0.4); padding-top: 1rem; font-weight: 900; font-size: 1.3rem; color: var(--accent); display:flex; justify-content:space-between; align-items:center;">
-        <span>الإجمالي المستحق: <span id="cartModalTotal">0.00</span> ر.ي</span>
+      <div style="margin-top: 1.5rem; border-top: 1px dashed rgba(200, 155, 60, 0.4); padding-top: 1rem; font-weight: 900; font-size: 1.3rem; color: var(--accent);">
+        <div id="deliveryFeeSummary" style="display:none; margin-bottom:0.45rem; font-size:0.9rem; color:var(--text-muted);"></div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span>الإجمالي المستحق: <span id="cartModalTotal">0.00</span> ر.ي</span>
+        </div>
       </div>
 
+      <button id="deliveryValidationNotice" class="delivery-validation-notice" type="button" aria-live="assertive" hidden onclick="dismissDeliveryValidation()">
+        <span id="deliveryValidationText"></span>
+        <span class="delivery-validation-close" aria-hidden="true">×</span>
+      </button>
       <button type="button" class="btn-modal-action" onclick="sendFullOrderToWhatsApp()">تأكيد وإرسال عبر واتساب 💬</button>
     </div>
   </div>
@@ -2438,10 +2448,25 @@
       }
     }
 
+    function getDeliveryFee(itemsSubtotal = cart.reduce((total, item) => total + item.price * item.qty, 0)) {
+      return itemsSubtotal < 30 ? 10 : 5;
+    }
+
     function updateCartModalTotal() {
-       let subtotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+       const itemsSubtotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+       let subtotal = itemsSubtotal;
        const method = document.getElementById('deliverySelect').value;
-       if (method === 'توصيل') subtotal += 10;
+       const deliveryFee = getDeliveryFee(itemsSubtotal);
+       const deliveryOption = document.querySelector('#deliverySelect option[value="توصيل"]');
+       if (deliveryOption) deliveryOption.textContent = `توصيل للموقع (رسوم ${deliveryFee} ر.ي)`;
+       const deliveryFeeSummary = document.getElementById('deliveryFeeSummary');
+       if (method === 'توصيل') {
+         subtotal += deliveryFee;
+         deliveryFeeSummary.style.display = 'block';
+         deliveryFeeSummary.textContent = `رسوم التوصيل: ${deliveryFee} ر.ي`;
+       } else {
+         deliveryFeeSummary.style.display = 'none';
+       }
        document.getElementById('cartModalTotal').innerText = subtotal.toFixed(2);
        return subtotal;
     }
@@ -2505,6 +2530,20 @@
       else openCartReviewModal();
     }
 
+    function showDeliveryValidation(message, focusTargetId) {
+      const notice = document.getElementById('deliveryValidationNotice');
+      document.getElementById('deliveryValidationText').textContent = message;
+      notice.dataset.focusTarget = focusTargetId;
+      notice.hidden = false;
+    }
+
+    function dismissDeliveryValidation() {
+      const notice = document.getElementById('deliveryValidationNotice');
+      const focusTarget = document.getElementById(notice.dataset.focusTarget);
+      notice.hidden = true;
+      if (focusTarget) focusTarget.focus();
+    }
+
     function sendFullOrderToWhatsApp() {
       if (cart.length === 0) return;
 
@@ -2513,6 +2552,23 @@
       const carDetails = document.getElementById('carDetails').value.trim();
       const storeName = document.getElementById('storeName').value.trim();
       const storePhone = document.getElementById('storePhone').value.trim();
+
+      if (method === 'توصيل' && !customerAddress) {
+        showDeliveryValidation('الرجاء تعبئة الحقل: اكتب اسم العميل والحي أو العنوان.', 'customerAddress');
+        return;
+      }
+
+      if (method === 'استلام سيارة' && !carDetails) {
+        showDeliveryValidation('الرجاء تعبئة بيانات السيارة.', 'carDetails');
+        return;
+      }
+
+      if (method === 'من المحل' && (!storeName || !storePhone)) {
+        const missingFieldId = !storeName ? 'storeName' : 'storePhone';
+        const missingFieldName = !storeName ? 'اسم المستلم' : 'رقم الجوال';
+        showDeliveryValidation(`الرجاء تعبئة الحقل: ${missingFieldName}.`, missingFieldId);
+        return;
+      }
       
       let orderText = `السلام عليكم ورحمة الله،\nأرغب في تقديم طلب جديد من مطعم *شاورمايشن* - *فرع ${branchName}*:\n\n`;
       orderText += "------------------------------------\n📋 *تفاصيل الطلبات:*\n";
@@ -2541,8 +2597,9 @@
       } else if(method === 'توصيل') {
           orderText += `👤 *العميل / العنوان:* ${customerAddress ? customerAddress : 'لم يكتب العنوان'}\n`;
           orderText += `📍 *الموقع:* (سيتم إرسال الموقع عبر خرائط جوجل)\n`;
-          orderText += `🛵 رسوم التوصيل: +10 ر.ي\n`;
-          itemsSum += 10;
+          const deliveryFee = getDeliveryFee(itemsSum);
+          orderText += `🛵 رسوم التوصيل: +${deliveryFee} ر.ي\n`;
+          itemsSum += deliveryFee;
       } else if(method === 'استلام سيارة') {
           orderText += `🚗 *بيانات السيارة:* ${carDetails ? carDetails : 'لم يحدد'}\n`;
       } else if(method === 'من المحل') {
