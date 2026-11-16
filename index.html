@@ -2558,11 +2558,6 @@
         return;
       }
 
-      if (method === 'استلام سيارة' && !carDetails) {
-        showDeliveryValidation('الرجاء تعبئة بيانات السيارة.', 'carDetails');
-        return;
-      }
-
       if (method === 'من المحل' && (!storeName || !storePhone)) {
         const missingFieldId = !storeName ? 'storeName' : 'storePhone';
         const missingFieldName = !storeName ? 'اسم المستلم' : 'رقم الجوال';
